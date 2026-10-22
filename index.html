@@ -1,0 +1,483 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Guía de Contabilidad UNIROMANA</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;700&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a ledger book. Narrow reading column, sticky chip index, T-account motifs for Debe/Haber. */
+:root{
+  --bg:#f3f6f4; --paper:#ffffff; --ink:#17262a; --muted:#5a6b6e; --rule:#d5dfdc;
+  --accent:#0f6b5c; --accent-soft:#e0efeb; --debe:#1f5fa8; --haber:#a33a2c; --ok:#1d7a3e; --bad:#b0352a;
+  --display:"Zilla Slab",Georgia,serif; --body:"Source Sans 3",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1719; --paper:#162124; --ink:#e3ecea; --muted:#9db0ad; --rule:#2a3a3d;
+  --accent:#5cc4ae; --accent-soft:#1c3330; --debe:#7fb2ef; --haber:#ef8f80; --ok:#6fd08f; --bad:#f08a7e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1719; --paper:#162124; --ink:#e3ecea; --muted:#9db0ad; --rule:#2a3a3d;
+  --accent:#5cc4ae; --accent-soft:#1c3330; --debe:#7fb2ef; --haber:#ef8f80; --ok:#6fd08f; --bad:#f08a7e; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:760px;margin:0 auto;padding-block:32px 80px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(2rem,6vw,2.8rem);font-weight:700}
+h2{font-size:1.7rem;margin-top:56px;padding-bottom:8px;border-bottom:2px solid var(--ink)}
+h3{font-size:1.2rem;margin-top:28px}
+p{margin:10px 0}
+.eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.lede{color:var(--muted);max-width:60ch}
+nav.idx{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;margin-top:20px;
+  display:flex;gap:8px;overflow-x:auto;border-bottom:1px solid var(--rule)}
+nav.idx a{flex:none;font-size:.9rem;font-weight:600;text-decoration:none;color:var(--ink);padding:6px 12px;border:1px solid var(--rule);border-radius:999px;background:var(--paper)}
+nav.idx a:hover,nav.idx a:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+button{font:600 .9rem var(--body);padding:8px 14px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:var(--paper);cursor:pointer}
+button.ghost{background:transparent;color:var(--accent)}
+button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.eq{font-family:var(--mono);font-weight:600;font-size:clamp(1.1rem,4vw,1.5rem);text-align:center;padding:18px;margin:18px 0;
+  border-top:2px solid var(--ink);border-bottom:2px solid var(--ink)}
+.tbl{overflow-x:auto;margin:14px 0}
+table{border-collapse:collapse;width:100%;font-size:.95rem}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--mono);font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.d{color:var(--debe);font-weight:700}.h{color:var(--haber);font-weight:700}
+.cuentas{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));margin-top:16px}
+.cta{background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:14px 16px;min-width:0}
+.cta h3{margin:0 0 4px;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.tag{font-family:var(--mono);font-size:.72rem;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.tag.d{background:color-mix(in srgb,var(--debe) 14%,transparent)}.tag.h{background:color-mix(in srgb,var(--haber) 14%,transparent)}
+.cta ul{margin:6px 0 0;padding-left:18px}.cta li{margin:3px 0}
+.tacc{display:grid;grid-template-columns:1fr 1fr;max-width:420px;margin:18px auto;font-family:var(--mono);font-size:.9rem}
+.tacc .t{grid-column:1/3;text-align:center;font-weight:600;border-bottom:2px solid var(--ink);padding-bottom:4px}
+.tacc div.l{border-right:2px solid var(--ink);padding:8px;text-align:center;color:var(--debe)}
+.tacc div.r{padding:8px;text-align:center;color:var(--haber)}
+.q{background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:14px 16px;margin:12px 0}
+.q .num{font-family:var(--mono);color:var(--accent);font-weight:600;margin-right:6px}
+.q .stem{font-weight:600}
+.q ol{list-style:none;padding:0;margin:8px 0 0}
+.q ol li{padding:3px 0}
+.q ol li b{font-family:var(--mono);margin-right:6px}
+details{margin-top:10px}
+summary{cursor:pointer;font-size:.88rem;font-weight:600;color:var(--accent);width:max-content}
+.ans{margin-top:8px;padding:10px 12px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 6px 6px 0}
+.ans .r{font-weight:700}
+.vf.v .r{color:var(--ok)}.vf.f .r{color:var(--bad)}
+.note{font-size:.9rem;color:var(--muted)}
+.work{font-family:var(--mono);font-size:.92rem;background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:12px 14px;overflow-x:auto;white-space:pre}
+.rule-box{background:var(--paper);border:2px solid var(--ink);border-radius:6px;padding:14px 16px;margin:16px 0}
+#exam{background:var(--paper);border:2px solid var(--ink);border-radius:8px;padding:18px;margin-top:20px}
+#exam h2{margin-top:0;border:0;padding:0}
+.setup{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.setup label{font-weight:600}
+select{font:inherit;padding:7px 10px;border-radius:8px;border:1px solid var(--rule);background:var(--bg);color:var(--ink)}
+.bar{height:6px;background:var(--rule);border-radius:3px;overflow:hidden;margin:12px 0}
+.bar i{display:block;height:100%;background:var(--accent);transition:width .2s}
+.meta{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.82rem;color:var(--muted)}
+.kind{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
+.opts{display:grid;gap:8px;margin-top:12px}
+.opt{text-align:left;font:400 1rem/1.4 var(--body);background:var(--bg);color:var(--ink);border:1px solid var(--rule);border-radius:8px;padding:10px 12px}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt:disabled{cursor:default}
+.opt.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--bg));font-weight:600}
+.opt.no{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,var(--bg))}
+.fb{margin-top:12px}
+.score{font-family:var(--display);font-size:3rem;font-weight:700;line-height:1}
+.miss{border-top:1px solid var(--rule);padding:10px 0;font-size:.95rem}
+footer{margin-top:60px;font-size:.85rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:14px}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+html{scroll-behavior:smooth}
+section{scroll-margin-top:70px}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">UNIROMANA · Contabilidad</div>
+  <h1>Guía de estudio: las cuentas contables</h1>
+  <p class="lede">Todo el material de clase en un solo lugar: teoría, ejercicios de la ecuación contable, Verdadero o Falso y selección múltiple con justificación. Las respuestas están ocultas para que te pongas a prueba.</p>
+  <div class="tools">
+    <button type="button" id="showAll">Mostrar todas las respuestas</button>
+    <button type="button" class="ghost" id="hideAll">Ocultar todas</button>
+  </div>
+</header>
+
+<nav class="idx" aria-label="Secciones">
+  <a href="#exam">Simulacro</a><a href="#teoria">Teoría</a><a href="#reglas">Debe / Haber</a><a href="#clasificar">Clasificar</a>
+  <a href="#ecuacion">Ecuación</a><a href="#origen">Origen D/C</a><a href="#vf">V o F</a>
+  <a href="#conteste">Conteste</a><a href="#seleccion">Selección</a>
+</nav>
+
+<section id="exam">
+  <div class="eyebrow">Ponte a prueba</div>
+  <h2>Simulacro de examen</h2>
+  <p>Preguntas al azar de todo el material: selección múltiple, Verdadero o Falso, clasificar cuentas, débito o crédito y la ecuación contable. Contestas, ves si acertaste y por qué, y al final te da la nota con lo que fallaste.</p>
+  <div class="setup">
+    <label for="nq">Preguntas</label>
+    <select id="nq"><option value="10">10</option><option value="20" selected>20</option><option value="30">30</option><option value="999">Todas</option></select>
+    <button type="button" id="start">Empezar examen</button>
+  </div>
+  <div id="stage" hidden></div>
+</section>
+
+<section id="teoria">
+<h2>1. Teoría</h2>
+
+<h3>¿A qué llamamos cuenta?</h3>
+<p>Es el nombre técnico que se usa para registrar, clasificar y resumir de forma ordenada los aumentos y disminuciones de cada elemento del Activo, Pasivo, Patrimonio, Ingresos y Gastos. Cada cuenta representa un objeto, persona o concepto específico (Caja, Bancos, Proveedores).</p>
+
+<h3>Partes de una cuenta</h3>
+<div class="tacc" aria-label="Cuenta T">
+  <div class="t">Nombre de la cuenta</div>
+  <div class="l">DEBE<br><small>lado izquierdo</small></div>
+  <div class="r">HABER<br><small>lado derecho</small></div>
+</div>
+<ol>
+  <li><b>Nombre (título):</b> identifica qué se registra.</li>
+  <li><b>Debe:</b> lado izquierdo. Registrar aquí es "cargar" o "debitar".</li>
+  <li><b>Haber:</b> lado derecho. Registrar aquí es "abonar" o "acreditar".</li>
+  <li><b>Saldo:</b> diferencia entre Debe y Haber. Si el Debe es mayor, saldo deudor; si el Haber es mayor, saldo acreedor.</li>
+</ol>
+
+<h3>Cuentas reales y nominales</h3>
+<div class="tbl"><table>
+<tr><th></th><th>Reales</th><th>Nominales</th></tr>
+<tr><td><b>Qué son</b></td><td>Bienes, derechos y obligaciones</td><td>Ingresos y gastos de un periodo</td></tr>
+<tr><td><b>Cuáles</b></td><td>Activo, Pasivo, Capital</td><td>Ingresos, Gastos, Costos</td></tr>
+<tr><td><b>Al cierre</b></td><td>No se cierran; el saldo pasa al siguiente periodo</td><td>Se cierran contra Pérdidas y Ganancias y quedan en cero</td></tr>
+<tr><td><b>Estado</b></td><td>Balance General</td><td>Estado de Resultados</td></tr>
+</table></div>
+
+<h3>Clasificación según su origen</h3>
+<ul>
+  <li><b>Personales (subjetivas):</b> representan personas naturales o jurídicas. Ej: Cuentas por Cobrar a Juan Pérez, Proveedor XYZ SRL.</li>
+  <li><b>Impersonales (objetivas):</b> representan bienes, valores o resultados. Ej: Mobiliario, Ventas, Depreciación. Se dividen en reales y nominales.</li>
+</ul>
+
+<h3>La ecuación contable básica</h3>
+<div class="eq">ACTIVO = PASIVO + CAPITAL</div>
+<div class="tbl"><table>
+<tr><th>Para hallar</th><th>Fórmula</th></tr>
+<tr><td>Activo</td><td class="n" style="text-align:left">Pasivo + Capital</td></tr>
+<tr><td>Pasivo</td><td class="n" style="text-align:left">Activo − Capital</td></tr>
+<tr><td>Capital</td><td class="n" style="text-align:left">Activo − Pasivo</td></tr>
+</table></div>
+<p>Todo lo que la empresa posee (Activo) fue financiado por deudas con terceros (Pasivo) o por los dueños (Capital). Por la <b>partida doble</b>, cada transacción afecta al menos dos cuentas y el total del Debe siempre es igual al total del Haber.</p>
+
+<h3>Las 6 cuentas principales</h3>
+<div class="cuentas">
+  <div class="cta"><h3>Activo <span class="tag d">Deudora</span></h3>
+    <p>Bienes y derechos que la empresa controla y que le darán beneficios futuros.</p>
+    <ul><li><b>Corriente:</b> menos de 1 año. Caja, bancos, cuentas por cobrar, inventario.</li>
+    <li><b>No corriente (fijo):</b> más de 1 año. Terrenos, edificios, vehículos, maquinaria, mobiliario.</li>
+    <li><b>Intangible:</b> sin forma física. Marcas, patentes, software.</li></ul></div>
+  <div class="cta"><h3>Pasivo <span class="tag h">Acreedora</span></h3>
+    <p>Obligaciones con terceros que implican una salida futura de recursos.</p>
+    <ul><li><b>Corriente:</b> menos de 1 año. Cuentas por pagar, ITBIS por pagar, sueldos por pagar.</li>
+    <li><b>No corriente:</b> más de 1 año. Hipotecas, préstamos a largo plazo, bonos.</li>
+    <li><b>Contingente:</b> depende de un evento futuro incierto, como una demanda.</li></ul></div>
+  <div class="cta"><h3>Capital <span class="tag h">Acreedora</span></h3>
+    <p>Lo que pertenece a los dueños después de restar los pasivos.</p>
+    <ul><li><b>Contribuido:</b> capital social, aporte inicial, prima en venta de acciones.</li>
+    <li><b>Ganado:</b> utilidades retenidas, reservas legales, resultados de ejercicios anteriores.</li>
+    <li>Lo disminuyen: retiros, dividendos y pérdidas.</li></ul></div>
+  <div class="cta"><h3>Ingresos <span class="tag h">Acreedora</span></h3>
+    <p>Aumentos de beneficios del periodo que incrementan el patrimonio.</p>
+    <ul><li><b>Ordinarios (operacionales):</b> del giro del negocio. Ventas, servicios.</li>
+    <li><b>No ordinarios:</b> ajenos al giro. Intereses ganados, venta de un activo fijo.</li></ul></div>
+  <div class="cta"><h3>Gastos <span class="tag d">Deudora</span></h3>
+    <p>Disminuciones de beneficios del periodo que reducen el patrimonio.</p>
+    <ul><li><b>Operativos:</b> administrativos (sueldos de oficina, alquiler, luz) y de ventas (comisiones, publicidad).</li>
+    <li><b>Financieros:</b> intereses y comisiones bancarias.</li>
+    <li>Por el <b>devengo</b>, se registran cuando se incurren, no cuando se pagan.</li></ul></div>
+  <div class="cta"><h3>Costos <span class="tag d">Deudora</span></h3>
+    <p>Lo directamente ligado a producir o comprar lo que se vende. Se guarda en inventario hasta la venta.</p>
+    <ul><li>Costo de mercancía vendida, materia prima, mano de obra directa.</li></ul></div>
+</div>
+
+<h3>Cómo se conectan</h3>
+<div class="work">Ventas (Ingreso) − Costo de Venta = Utilidad Bruta
+Utilidad Bruta − Gastos            = Utilidad Neta
+Utilidad Neta  → aumenta el Capital (utilidades retenidas)</div>
+<p><b>Costo vs. gasto:</b> el costo entra primero al inventario y pasa a resultados cuando se vende; el gasto se consume en el periodo.</p>
+</section>
+
+<section id="reglas">
+<h2>2. Reglas del Debe y el Haber</h2>
+<div class="tbl"><table>
+<tr><th>Cuenta</th><th>Aumenta</th><th>Disminuye</th><th>Saldo normal</th></tr>
+<tr><td>Activo</td><td class="d">Debe</td><td class="h">Haber</td><td>Deudor</td></tr>
+<tr><td>Gastos</td><td class="d">Debe</td><td class="h">Haber</td><td>Deudor</td></tr>
+<tr><td>Costos</td><td class="d">Debe</td><td class="h">Haber</td><td>Deudor</td></tr>
+<tr><td>Pasivo</td><td class="h">Haber</td><td class="d">Debe</td><td>Acreedor</td></tr>
+<tr><td>Capital</td><td class="h">Haber</td><td class="d">Debe</td><td>Acreedor</td></tr>
+<tr><td>Ingresos</td><td class="h">Haber</td><td class="d">Debe</td><td>Acreedor</td></tr>
+</table></div>
+<div class="rule-box"><b>Truco para memorizar:</b> Activo, Gastos y Costos aumentan al <span class="d">Débito</span>. Pasivo, Capital e Ingresos aumentan al <span class="h">Crédito</span>.<br>"Cargar" = registrar en el Debe. "Abonar" = registrar en el Haber.</div>
+
+<h3>Ejemplo: inversión inicial</h3>
+<p>El dueño aporta RD$500,000 en efectivo para iniciar el negocio. Es <b>Capital</b>, no ingreso, porque no viene de vender nada.</p>
+<div class="tbl"><table>
+<tr><th>Cuenta</th><th style="text-align:right">Debe</th><th style="text-align:right">Haber</th></tr>
+<tr><td>Efectivo en Caja</td><td class="n">500,000</td><td></td></tr>
+<tr><td>Capital (Inversión Inicial)</td><td></td><td class="n">500,000</td></tr>
+</table></div>
+</section>
+
+<section id="clasificar">
+<h2>3. Clasificar cuentas</h2>
+<p class="note">Ejercicio de la pizarra: diga si es Activo, Pasivo, Capital, Ingreso o Gasto.</p>
+<div class="q"><div id="clasif"></div></div>
+</section>
+
+<section id="ecuacion">
+<h2>4. Ejercicios de la ecuación contable</h2>
+<div id="ecu"></div>
+
+<h3>Llene el espacio en blanco</h3>
+<div class="tbl"><table id="blancos">
+<tr><th>#</th><th style="text-align:right">Activo</th><th style="text-align:right">Pasivo</th><th style="text-align:right">Capital</th></tr>
+</table></div>
+<details class="toggle"><summary>Ver respuestas</summary><div class="ans" id="blancosAns"></div></details>
+
+<h3>Preguntas de repaso</h3>
+<div id="repaso"></div>
+</section>
+
+<section id="origen">
+<h2>5. Origen (Débito / Crédito) y nombre de la cuenta</h2>
+<div class="tbl"><table id="origenT"><tr><th>Cuenta</th><th>Nombre</th><th>Origen</th></tr></table></div>
+<details class="toggle"><summary>Ver respuestas</summary><div class="ans">Todas las respuestas aparecen en la tabla al abrir esta sección.</div></details>
+</section>
+
+<section id="vf">
+<h2>6. Verdadero o Falso</h2>
+<p class="note">Justifica las falsas.</p>
+<div id="vfList"></div>
+</section>
+
+<section id="conteste">
+<h2>7. Conteste</h2>
+<div id="cont"></div>
+</section>
+
+<section id="seleccion">
+<h2>8. Selecciona y justifica la respuesta</h2>
+<div id="selList"></div>
+</section>
+
+<footer>Guía armada con el material de clase de Contabilidad, UNIROMANA. En el V o F, las oraciones 54, 57 y 58 salieron cortadas en la foto; se asumió su final más probable.</footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const fmt=n=>n.toLocaleString('en-US');
+const det=(inner,cls='')=>`<details class="toggle"><summary>Ver respuesta</summary><div class="ans ${cls}">${inner}</div></details>`;
+
+// 3. Clasificar
+const clasif=[["Edificio","Activo"],["Terreno","Activo"],["Cuenta por pagar","Pasivo"],["Hipoteca","Pasivo"],["Efectivo en caja","Activo"],["Documento por pagar","Pasivo"],["Ventas de mercancía","Ingreso"],["Pago de alquiler","Gasto"],["Aporte inicial","Capital"],["Venta de servicio","Ingreso"],["Equipo de transporte","Activo"],["Equipo de oficina","Activo"],["Suministro de oficina","Activo (si se consume, pasa a Gasto)"],["Pago de combustible","Gasto"],["Nave industrial","Activo"],["Tráiler","Activo"]];
+$('#clasif').innerHTML='<ol style="padding-left:22px;margin:0">'+clasif.map(c=>`<li>${c[0]}</li>`).join('')+'</ol>'+
+ det('<div class="tbl"><table>'+clasif.map((c,i)=>`<tr><td>${i+1}. ${c[0]}</td><td><b>${c[1]}</b></td></tr>`).join('')+'</table></div><p><b>Activo:</b> lo que se posee. <b>Pasivo:</b> lo que se debe. <b>Capital:</b> aporte de los dueños. <b>Ingreso:</b> ventas del negocio. <b>Gasto:</b> lo que se consume para operar.</p>');
+
+// 4. Ecuación
+const ecu=[
+ {t:"Ejercicio I (pizarra): Determine el Activo = Pasivo + Capital",datos:[["Cuenta por pagar",50000,"P"],["Interés por pagar",100000,"P"],["Documentos por pagar",100000,"P"],["Préstamo",400000,"P"],["Hipoteca",200000,"P"],["Aporte inicial",1500000,"C"]],sol:"Pasivo = 50,000 + 100,000 + 100,000 + 400,000 + 200,000 = 850,000\nCapital = 1,500,000\nActivo = 850,000 + 1,500,000 = RD$2,350,000"},
+ {t:"Ejercicio II (pizarra): Determine el Pasivo = Activo − Capital",datos:[["Suministros de oficina",500000,"A"],["Cuenta por cobrar",1500000,"A"],["Edificio",3000000,"A"],["Terreno",1000000,"A"],["Equipo de transporte",800000,"A"],["Aporte inicial",2300000,"C"]],sol:"Activo = 500,000 + 1,500,000 + 3,000,000 + 1,000,000 + 800,000 = 6,800,000\nCapital = 2,300,000\nPasivo = 6,800,000 − 2,300,000 = RD$4,500,000"},
+ {t:"Hoja I: Determine el Capital = Activo − Pasivo",datos:[["Edificio",350000,"A"],["Escritorio",15000,"A"],["Sillas",25000,"A"],["Computadora",105000,"A"],["Cuentas por pagar",5000,"P"],["Préstamo",250000,"P"]],sol:"Activo = 350,000 + 15,000 + 25,000 + 105,000 = 495,000\nPasivo = 5,000 + 250,000 = 255,000\nCapital = 495,000 − 255,000 = RD$240,000"},
+ {t:"Hoja II: Determine el Pasivo = Activo − Capital",datos:[["Equipo de transporte",1800000,"A"],["Edificio",2600000,"A"],["Aporte inicial",1950500,"C"]],sol:"Activo = 1,800,000 + 2,600,000 = 4,400,000\nCapital = 1,950,500\nPasivo = 4,400,000 − 1,950,500 = RD$2,449,500"},
+ {t:"Hoja III: Determine el Activo = Pasivo + Capital",datos:[["Aporte inicial",3500000,"C"],["Cuenta por pagar",95000,"P"],["Hipoteca",150000,"P"],["Interés por pagar",25000,"P"]],sol:"Pasivo = 95,000 + 150,000 + 25,000 = 270,000\nCapital = 3,500,000\nActivo = 270,000 + 3,500,000 = RD$3,770,000"}
+];
+$('#ecu').innerHTML=ecu.map(e=>`<div class="q"><div class="stem">${e.t}</div><div class="tbl"><table>${e.datos.map(d=>`<tr><td>${d[0]}</td><td class="n">$${fmt(d[1])}</td></tr>`).join('')}</table></div>${det(`<div class="work" style="border:0;background:none;padding:0">${e.sol}</div>`)}</div>`).join('')+
+`<div class="q"><div class="stem">Hallar el valor faltante</div><div class="tbl"><table>
+<tr><th>#</th><th style="text-align:right">Activo</th><th style="text-align:right">Pasivo</th><th style="text-align:right">Capital</th></tr>
+${[[1,150000,60000,null],[2,null,45000,110000],[3,320000,null,200000],[4,25000,0,null],[5,450000,160000,null],[6,null,275000,585000],[7,810000,null,530000]].map(r=>`<tr><td>${r[0]}</td>${r.slice(1).map(v=>`<td class="n">${v===null?'?':'$'+fmt(v)}</td>`).join('')}</tr>`).join('')}
+</table></div>${det('<div class="work" style="border:0;background:none;padding:0">1. Capital = 150,000 − 60,000 = $90,000\n2. Activo  = 45,000 + 110,000 = $155,000\n3. Pasivo  = 320,000 − 200,000 = $120,000\n4. Capital = 25,000 − 0 = $25,000\n5. Capital = 450,000 − 160,000 = $290,000\n6. Activo  = 275,000 + 585,000 = $860,000\n7. Pasivo  = 810,000 − 530,000 = $280,000</div>')}</div>`;
+
+const bl=[[null,85000,125000,210000],[460000,null,300000,160000],[685600,281000,null,404600],[null,265000,475900,740900],[2000000,null,1560800,439200],[14900,6500,null,8400],[null,25000,48600,73600]];
+$('#blancos').insertAdjacentHTML('beforeend',bl.map((r,i)=>`<tr><td>${i+1}</td>${r.slice(0,3).map(v=>`<td class="n">${v===null?'______':fmt(v)}</td>`).join('')}</tr>`).join(''));
+$('#blancosAns').innerHTML='<div class="work" style="border:0;background:none;padding:0">'+[
+"1. Activo  = 85,000 + 125,000 = 210,000","2. Pasivo  = 460,000 − 300,000 = 160,000","3. Capital = 685,600 − 281,000 = 404,600","4. Activo  = 265,000 + 475,900 = 740,900","5. Pasivo  = 2,000,000 − 1,560,800 = 439,200","6. Capital = 14,900 − 6,500 = 8,400","7. Activo  = 25,000 + 48,600 = 73,600"].join('\n')+'</div>';
+
+const rep=[
+["¿Qué es un Activo y cuáles son sus dos clasificaciones principales según la rapidez con la que se convierten en efectivo?","Son los bienes y derechos que la empresa posee y de los que espera beneficios futuros. Se clasifica en <b>Activo Corriente</b> (se convierte en efectivo en menos de un año) y <b>Activo No Corriente</b> (permanece más de un año)."],
+["Diferencia entre Activo Corriente y No Corriente, con un ejemplo de cada uno.","El corriente se convierte en efectivo o se consume en menos de 1 año; el no corriente se usa en la operación por más tiempo. Corriente: cuentas por cobrar. No corriente: edificio."],
+["¿Cómo se define el Capital (Patrimonio Neto) y con qué fórmula se calcula?","Es lo que pertenece a los dueños después de cubrir las deudas. <b>Capital = Activo − Pasivo</b>."],
+["Activos = $980,000 y Pasivos = $375,000. ¿Cuánto es el Capital Neto?","980,000 − 375,000 = <b>$605,000</b>"],
+["¿A qué elemento pertenecen: Cuentas por Cobrar, Préstamo Bancario a Largo Plazo, Utilidades Retenidas, Inventario de Mercancía?","Cuentas por Cobrar: <b>Activo</b>. Préstamo a Largo Plazo: <b>Pasivo</b>. Utilidades Retenidas: <b>Capital</b>. Inventario: <b>Activo</b>."]];
+$('#repaso').innerHTML=rep.map((r,i)=>`<div class="q"><span class="num">${i+1}.</span><span class="stem">${r[0]}</span>${det(r[1])}</div>`).join('');
+
+// 5. Origen
+const org=[["Banco","Activo","Débito"],["Escritorio","Activo","Débito"],["Aporte inicial","Capital","Crédito"],["Pago de sueldos","Gasto","Débito"],["Hipoteca","Pasivo","Crédito"],["Equipo de transporte","Activo","Débito"],["Ventas de mercancías","Ingreso","Crédito"],["Interés por pagar","Pasivo","Crédito"],["Sueldos por pagar","Pasivo","Crédito"],["Cuenta por cobrar","Activo","Débito"],["Efectivo en caja","Activo","Débito"],["Edificio","Activo","Débito"],["Ventas de servicios","Ingreso","Crédito"],["Cuenta por pagar","Pasivo","Crédito"],["Préstamo","Pasivo","Crédito"]];
+$('#origenT').insertAdjacentHTML('beforeend',org.map((o,i)=>`<tr><td>${o[0]}${i===0?' <span class="note">(ejemplo)</span>':''}</td><td class="hide-ans">${o[1]}</td><td class="hide-ans ${o[2]==='Débito'?'d':'h'}">${o[2]}</td></tr>`).join(''));
+const origDet=$('#origen details');
+const syncOrig=()=>document.querySelectorAll('#origenT .hide-ans').forEach((c,i)=>{c.style.visibility=(origDet.open||i<2)?'visible':'hidden'});
+origDet.addEventListener('toggle',syncOrig);syncOrig();
+
+// 6. V o F
+const vf=[
+["El efectivo en caja es una cuenta de activo circulante.",1],
+["Las cuentas por cobrar representan un derecho y son un activo.",1],
+["Los terrenos y edificios de la empresa son pasivos.",0,"Son Activos fijos (no corrientes): bienes que la empresa posee, no deudas."],
+["Un inventario de mercancías se considera un activo.",1],
+["Los activos aumentan con un registro en el haber.",0,"Los activos aumentan en el Debe y disminuyen en el Haber."],
+["La maquinaria utilizada en la producción es un activo fijo.",1],
+["Las marcas y patentes son ejemplos de activos intangibles.",1],
+["Un anticipo otorgado a un proveedor es un derecho, por ende un activo.",1,"La empresa ya pagó y tiene derecho a recibir la mercancía o el servicio."],
+["Los activos disminuyen cuando se realizan cargos en ellos.",0,"Un cargo es un registro en el Debe, y eso aumenta el activo. Disminuyen con abonos (Haber)."],
+["El mobiliario y equipo de oficina forman parte del activo no corriente.",1],
+["Los pasivos son obligaciones presentes derivadas de sucesos pasados.",1],
+["Las cuentas por pagar a proveedores son un activo.",0,"Son Pasivo: una deuda con terceros."],
+["Los préstamos bancarios a largo plazo son pasivos.",1],
+["Los pasivos aumentan anotando una cantidad en el haber.",1],
+["Los impuestos por pagar se consideran un pasivo corriente.",1],
+["Un documento por pagar disminuye el pasivo cuando se firma.",0,"Al firmarlo la empresa adquiere una nueva obligación: el pasivo aumenta."],
+["Los pasivos representan los bienes propios de los socios.",0,"Eso es el Capital. Los pasivos son deudas con terceros."],
+["El saldo normal de las cuentas de pasivo es deudor.",0,"Es acreedor. El deudor corresponde a Activo y Gasto."],
+["Los salarios devengados por los empleados pendientes de pago son pasivos.",1],
+["Los pasivos disminuyen cuando se registra un pago en el debe.",1],
+["El capital contable es la diferencia entre activo y pasivo.",1],
+["Las aportaciones de los socios incrementan el capital social.",1],
+["Las utilidades del ejercicio forman parte del capital.",1],
+["El capital contable tiene por regla general un saldo acreedor.",1],
+["Los retiros de dinero del dueño para uso personal aumentan el capital.",0,"Los retiros disminuyen el capital: el dueño saca recursos de la empresa."],
+["El capital social disminuye cuando se registran pérdidas acumuladas.",1],
+["El capital contable es sinónimo de obligación con terceros.",0,"El capital pertenece a los dueños. La obligación con terceros es el Pasivo."],
+["Las reservas legales forman parte del patrimonio neto.",1],
+["Las cuentas de capital aumentan con un cargo en el debe.",0,"Aumentan con un abono en el Haber; un cargo las disminuye."],
+["La ecuación contable básica es Activo = Pasivo + Capital.",1],
+["Los ingresos representan incrementos en los beneficios económicos.",1],
+["Una venta de mercancía al contado genera un ingreso.",1],
+["Los ingresos disminuyen el patrimonio neto de la empresa.",0,"Los ingresos aumentan el patrimonio. Lo disminuyen los gastos y los retiros."],
+["Los intereses ganados en una cuenta bancaria son un ingreso.",1],
+["Las cuentas de ingresos tienen un saldo normal acreedor.",1],
+["Los ingresos se registran inicialmente cargándose en el debe.",0,"Se registran en el Haber (crédito). El Debe los disminuye."],
+["La prestación de un servicio profesional constituye un ingreso.",1],
+["Un cobro a un cliente por una venta pasada crea un nuevo ingreso.",0,"El ingreso se reconoció al vender. El cobro solo cambia Cuenta por Cobrar por Efectivo."],
+["Los ingresos por alquileres incrementan las ganancias del periodo.",1],
+["Al final del periodo, los ingresos se cancelan contra pérdidas y ganancias.",1],
+["Los gastos representan salidas o consumo de recursos.",1],
+["El pago de la energía eléctrica de la oficina es un gasto.",1],
+["Los gastos aumentan el capital o patrimonio de la entidad.",0,"Los gastos disminuyen el patrimonio. Lo aumentan los ingresos."],
+["Los gastos tienen un saldo normal deudor.",1],
+["El pago de sueldos al personal operativo es un gasto administrativo o de operación.",1],
+["Los gastos se incrementan realizando anotaciones en el debe.",1],
+["La compra de un terreno es un gasto corriente de la empresa.",0,"El terreno es un Activo fijo; no se consume en el periodo."],
+["La depreciación de los equipos es un gasto no monetario del periodo.",1,"No sale efectivo, pero reconoce el desgaste del activo."],
+["Los gastos disminuyen el resultado neto del ejercicio.",1],
+["Los gastos se abonan (van al haber) únicamente para cancelar su saldo al cierre del periodo.",1],
+["El lado débito de una cuenta contable se ubica siempre en la columna de la izquierda.",1],
+["Un registro en el lado crédito siempre significa que el dinero de la empresa está aumentando.",0,"El crédito disminuye los Activos como Caja y Bancos; no siempre implica más dinero."],
+["Las cuentas de Gastos aumentan su saldo cuando se realiza una anotación en el lado débito.",1],
+["Para disminuir el saldo de una cuenta de Pasivo, se debe registrar un movimiento en el lado crédito.",0,"El Pasivo disminuye con un débito; el crédito lo aumenta."],
+["En el sistema de partida doble, un asiento contable puede tener solo registros en el débito sin necesidad de un crédito.",0,"Todo asiento lleva al menos un débito y un crédito, y el total del Debe es igual al del Haber."],
+["Las cuentas de Ingresos se originan e incrementan registrando montos en el lado crédito.",1],
+["Si una cuenta tiene un saldo deudor, significa que la suma del lado débito fue mayor que la suma del lado crédito.",1],
+["Al pagarle en efectivo a un proveedor, la cuenta \"Caja\" se debe registrar en el lado débito porque está reduciendo el activo.",0,"Caja va al crédito porque el Activo disminuye con un abono. El débito va a Cuentas por Pagar."],
+["Las cuentas de Capital Contable aumentan su valor mediante anotaciones en el lado crédito.",1],
+["El término \"cargar\" una cuenta es sinónimo de realizar un registro en el lado débito.",1]];
+$('#vfList').innerHTML=vf.map((v,i)=>`<div class="q"><span class="num">${i+1}.</span>${v[0]}${det(`<span class="r">${v[1]?'Verdadero':'Falso'}</span>${v[2]?'<br>'+(v[1]?'':'Justificación: ')+v[2]:''}`,'vf '+(v[1]?'v':'f'))}</div>`).join('');
+
+// 7. Conteste
+const cont=[["Mencione 3 Activos","Efectivo en caja, Edificio, Cuentas por cobrar"],["Mencione 3 Gastos","Pago de alquiler, Pago de sueldos, Energía eléctrica"],["Mencione 3 Pasivos","Cuentas por pagar, Préstamo bancario, Hipoteca"],["Mencione 2 Ingresos","Ventas de mercancía, Ventas de servicios"]];
+$('#cont').innerHTML=cont.map((c,i)=>`<div class="q"><span class="num">${i+1}.</span><span class="stem">${c[0]}</span>${det(c[1])}</div>`).join('');
+
+// 8. Selección
+const S=[
+["¿Qué representa una cuenta de activo en la contabilidad de una empresa?",["Las deudas y obligaciones financieras que la empresa debe pagar a terceros.","Los bienes, derechos y recursos controlados económicamente de los cuales se esperan beneficios futuros.","Los ingresos generados exclusivamente por la venta de mercancías al contado.","El capital aportado únicamente por los socios fundadores."],"B","El activo es todo lo que la empresa posee o controla y de lo que espera beneficios futuros. La A describe el Pasivo, la C un Ingreso (limitado sin razón a ventas al contado) y la D el Capital."],
+["¿Cuál de las siguientes opciones corresponde a un ejemplo de Activo Corriente (Circulante)?",["Maquinaria y equipo de producción.","Edificios administrativos.","Cuentas por cobrar a clientes.","Patentes y marcas registradas."],"C","Las cuentas por cobrar se convierten en efectivo en menos de un año. La A y la B son activos fijos y la D son intangibles, todos no corrientes."],
+["¿Cómo se clasifican los activos tangibles que forman parte de los bienes duraderos de uso de la empresa, tales como terrenos, edificios y vehículos?",["Activos diferidos.","Pasivos corrientes.","Propiedades, Planta y Equipo (Activo Fijo).","Activos intangibles."],"C","Son bienes físicos usados por más de un año en la operación, no para vender. La A son gastos pagados por anticipado, la B son deudas y la D no aplica porque estos bienes tienen existencia física."],
+["¿Qué naturaleza tiene la cuenta de \"Depreciación Acumulada\" y cuál es su función principal?",["Es una cuenta de pasivo que aumenta el valor de los activos fijos.","Es una cuenta de activo con saldo acreedor que refleja la pérdida de valor de los activos fijos por el uso o el tiempo.","Es una cuenta de resultado que registra las ganancias obtenidas por la venta de inventarios.","Es un derecho de cobro a corto plazo frente a los proveedores."],"B","Es una cuenta regularizadora del activo, por eso su saldo es acreedor, y se resta del activo fijo para mostrar su valor en libros. La A falla porque no es pasivo y además reduce el activo; la C describe una ganancia y la D un anticipo a proveedores."],
+["¿Cuál de los siguientes elementos se considera un Activo Intangible?",["Inventario de mercancías.","Dinero en efectivo depositado en bancos.","Una patente o derecho de explotación exclusivo.","Equipo de cómputo y mobiliario de oficina."],"C","El intangible no tiene existencia física pero sí valor económico. La A y la B son activos corrientes y la D son activos fijos tangibles."],
+["¿Qué representa una cuenta de pasivo en la contabilidad de una empresa?",["Los bienes y derechos propiedad de la empresa.","Las deudas y obligaciones financieras contraídas por la empresa con terceros.","Las ganancias acumuladas retenidas por los socios.","Los recursos invertidos exclusivamente en la compra de terrenos."],"B","El pasivo son obligaciones con terceros que implican una salida futura de recursos. La A es Activo, la C es Capital y la D no es una clasificación contable."],
+["¿Cuál de las siguientes opciones corresponde a un ejemplo de Pasivo Corriente (Circulante o a Corto Plazo)?",["Préstamos bancarios con vencimiento a 5 años.","Cuentas por pagar a proveedores a 30 días.","Bonos u obligaciones emitidos a largo plazo.","Capital social aportado por los accionistas."],"B","Se liquida en menos de un año. La A y la C vencen en más de un año y la D es Capital."],
+["¿Cómo se clasifican comúnmente las obligaciones financieras cuyo vencimiento o exigibilidad es mayor a un año?",["Pasivos Corrientes o Circulantes.","Pasivos No Corrientes (o a Largo Plazo).","Activos Diferidos.","Cuentas de Resultados deudoras."],"B","Las deudas a más de un año son Pasivos No Corrientes. La A es para menos de un año, la C es de activos y la D corresponde a gastos o costos."],
+["¿Qué es un \"Pasivo Contingente\"?",["Una deuda fija que la empresa debe pagar obligatoriamente cada mes sin excepción.","Una obligación presente surgida de sucesos pasados, cuyo pago es seguro al 100%.","Una obligación posible, cuya existencia depende de que ocurra o no un evento futuro incierto (como una demanda legal).","Un impuesto retenido a los empleados que ya fue pagado a la administración tributaria."],"C","Solo se confirma si ocurre un evento futuro incierto. La A y la B son pasivos ciertos y la D ya está pagada."],
+["¿Cuál es la naturaleza del saldo normal de las cuentas de pasivo en contabilidad?",["Saldo deudor (aumentan por el debe).","Saldo cero o neutral.","Saldo acreedor (aumentan por el haber).","Saldo variable según el tipo de moneda."],"C","El pasivo aumenta al Haber y disminuye al Debe. El saldo deudor es de Activos y Gastos; la B y la D no son reglas contables."],
+["¿Qué representa el Capital Contable en la estructura financiera de una empresa?",["Las deudas totales contraídas con proveedores y bancos.","El valor residual de los activos de la entidad, una vez deducidos todos sus pasivos.","Los ingresos brutos obtenidos por las ventas en un periodo contable.","El costo total de la maquinaria y equipo de producción."],"B","Capital = Activo − Pasivo. La A es Pasivo, la C son Ingresos y la D es solo parte del Activo fijo."],
+["¿Cuál es la naturaleza del saldo normal de las cuentas que componen el Capital Contable?",["Saldo deudor.","Saldo cero.","Saldo acreedor.","Saldo variable e impredecible."],"C","El Capital aumenta al Haber y disminuye al Debe. El saldo deudor es de Activos y Gastos; la B y la D no son reglas contables."],
+["¿Cómo se le denomina comúnmente a la aportación inicial o posterior realizada por los socios o accionistas de una empresa?",["Utilidades retenidas.","Capital social.","Pasivo a largo plazo.","Reserva legal."],"B","El Capital social es lo que aportan los socios. La A son ganancias no repartidas, la C es una deuda y la D es una parte de las utilidades que la ley obliga a apartar."],
+["¿Qué son las \"Utilidades Retenidas\" (o acumuladas)?",["Las ganancias generadas por la empresa que no han sido distribuidas a los socios como dividendos, sino reinvertidas en el negocio.","El dinero en efectivo que se guarda estrictamente para pagar impuestos.","Las deudas pendientes que los clientes aún no han pagado.","El capital aportado por nuevos socios que ingresan a la sociedad."],"A","Son ganancias que la empresa se queda en lugar de repartirlas. La B no es cuenta de capital, la C son Cuentas por Cobrar y la D es Capital social."],
+["¿Cuál de los siguientes elementos disminuye el valor del Capital Contable?",["La aportación de nuevo efectivo por parte de los accionistas.","La obtención de una utilidad neta al final del ejercicio fiscal.","El reparto de dividendos a los socios o las pérdidas netas del periodo.","La revalorización de los terrenos de la empresa."],"C","Los dividendos sacan recursos hacia los socios y las pérdidas reducen las utilidades acumuladas. La A, la B y la D lo aumentan."],
+["¿Qué representa la \"Reserva Legal\" dentro del capital contable?",["Un fondo obligatorio o estatutario apartado de las utilidades para proteger la estabilidad financiera de la empresa.","El dinero destinado exclusivamente para el pago de la nómina mensual.","Una deuda a corto plazo con las autoridades fiscales.","El valor de las marcas registradas y patentes."],"A","Es una parte de las utilidades que la ley o los estatutos obligan a apartar como respaldo. La B no es de capital, la C es pasivo y la D son intangibles."],
+["¿Qué indica la Ecuación Contable Básica respecto al Capital?",["Capital = Activo X Pasivo","Capital = Activo − Pasivo","Capital = Pasivo − Activo","Capital = Pasivo + Activo"],"B","Se despeja de Activo = Pasivo + Capital. La A no es una operación contable, la C invierte la resta y la D suma lo que no se suma."],
+["¿Cómo se clasifican generalmente las cuentas que integran el Capital Contable?",["Capital ganado y Capital contribuido.","Activos corrientes y Activos fijos.","Pasivos a corto plazo y Pasivos a largo plazo.","Ingresos operativos y Gastos financieros."],"A","Contribuido es lo que aportan los socios; ganado es lo que genera la empresa. La B es del Activo, la C del Pasivo y la D son cuentas de resultados."],
+["¿Cuál de los siguientes rubros forma parte del \"Capital Contribuido\"?",["Pérdidas acumuladas de años anteriores.","Prima en venta de acciones (aportaciones adicionales de los socios).","Utilidad neta del ejercicio actual.","Reservas estatutarias."],"B","La prima en venta de acciones es una aportación de los socios. La A, la C y la D son Capital Ganado porque salen de la operación."],
+["¿Qué reflejan las cuentas de \"Resultado de ejercicios anteriores\"?",["Las deudas comerciales que vencen el próximo año.","Las utilidades o pérdidas de periodos pasados que aún no han sido aplicadas definitivamente o repartidas.","El inventario físico de mercancías que quedó obsoleto.","El costo histórico de los edificios de la empresa."],"B","Acumula ganancias o pérdidas de años anteriores aún no repartidas, dentro del Capital Ganado. La A es pasivo, la C es inventario (activo) y la D es un activo fijo."],
+["¿Qué representan los ingresos en la contabilidad de una empresa?",["Las deudas adquiridas por la compra de mercancías a crédito.","Los aumentos en los beneficios económicos durante el periodo contable, en forma de entradas de recursos o disminución de pasivos, que aumentan el patrimonio neto.","El dinero que los socios aportan al momento de constituir la sociedad.","Los pagos obligatorios realizados por concepto de impuestos a la administración tributaria."],"B","Los ingresos aumentan el patrimonio. La A es pasivo, la C es Capital y la D es un gasto."],
+["¿Cuál es la naturaleza del saldo normal de las cuentas de ingresos?",["Saldo deudor.","Saldo cero.","Saldo acreedor.","Saldo variable según la divisa."],"C","Los ingresos aumentan al Haber. La B solo ocurre después del cierre y la D no es una regla contable."],
+["¿Cómo se clasifican generalmente los ingresos dentro del estado de resultados?",["Ingresos ordinarios (o operacionales) e Ingresos no ordinarios (o no operacionales).","Activos corrientes y Activos no corrientes.","Capital contribuido y Capital ganado.","Pasivos a corto plazo y Pasivos a largo plazo."],"A","Operacionales vienen del giro principal; no operacionales son ajenos a él. La B es del Activo, la C del Capital y la D del Pasivo."],
+["¿Qué son los \"Ingresos Ordinarios\" u Operacionales?",["Aquellos que provienen de la venta de activos fijos viejos de forma esporádica.","Las ganancias obtenidas por fluctuaciones cambiarias o venta de inversiones ocasionales.","Aquellos que surgen de las actividades ordinarias y principales de la empresa (como la venta de bienes o prestación de servicios propios de su objeto social).","Los préstamos otorgados por las instituciones bancarias."],"C","Vienen del giro principal del negocio. La A y la B son no ordinarios por ser esporádicos, y la D es un pasivo."],
+["¿Cuál de los siguientes ejemplos corresponde a un Ingreso No Ordinario (o Financiero/Otros)?",["Venta diaria de zapatos en una zapatería.","Prestación de servicios de consultoría legal por parte de un bufete de abogados.","Intereses ganados por tener dinero depositado en una cuenta bancaria de ahorros.","Cobro de facturas a los clientes por la mercancía entregada."],"C","Los intereses son un ingreso financiero ajeno a la actividad principal. La A y la B son ordinarios y la D es solo el cobro de una cuenta por cobrar."],
+["¿Qué representa un gasto en la contabilidad de una empresa?",["La compra de un activo fijo que durará varios años en la empresa.","Una disminución en los beneficios económicos durante el periodo contable, en forma de salidas o disminuciones de valor de los activos, o aumento de pasivos, que reducen el patrimonio neto.","El dinero prestado por una institución bancaria que debe devolverse a plazos.","El capital inicial aportado por los socios para abrir el negocio."],"B","El gasto consume recursos y reduce el patrimonio. La A es activo fijo, la C es pasivo y la D es Capital."],
+["¿Cuál es la naturaleza del saldo normal de las cuentas de gastos?",["Saldo deudor (aumentan por el debe).","Saldo acreedor (aumentan por el haber).","Saldo cero permanente.","Saldo variable sin regla fija."],"A","Los gastos aumentan al Debe. El acreedor es de Pasivo, Capital e Ingresos; la C solo ocurre tras el cierre y la D no es regla."],
+["¿Cómo se diferencian principalmente los \"Gastos Operativos\" de los \"Gastos Financieros\"?",["Los operativos son obligatorios por ley y los financieros son opcionales.","Los operativos están directamente relacionados con la actividad principal del negocio (como sueldos o alquileres), mientras que los financieros provienen del uso de capital ajeno (como intereses de deudas o comisiones bancarias).","Los operativos se pagan al contado y los financieros siempre se quedan a crédito.","No existe ninguna diferencia contable entre ambos tipos de gastos."],"B","Operativos mantienen funcionando el negocio; financieros vienen de usar dinero de terceros. La A y la C inventan reglas y la D es falsa porque se presentan por separado."],
+["Según el principio contable de \"Devengo\" (o acumulación), ¿en qué momento debe registrarse un gasto?",["Únicamente cuando la empresa paga la factura en efectivo o mediante transferencia bancaria.","Al momento en que se incurre en el costo o se consume el servicio/bien, independientemente de si ya ha sido pagado o no.","Al cierre definitivo del año fiscal en la declaración de impuestos.","Cuando los socios lo aprueben en una asamblea extraordinaria."],"B","El devengo registra el gasto cuando se genera, sin importar cuándo se pague. La A es el método de caja; la C y la D no tienen relación."],
+["¿Cuál de los siguientes ejemplos corresponde a un Gasto Administrativo?",["Comisiones pagadas a los vendedores por alcanzar sus metas de ventas.","Sueldos del personal de recepción, contabilidad y gerencia general.","Intereses generados por un préstamo bancario a largo plazo.","Costo de adquisición de la materia prima para la fabricación."],"B","Sirve para administrar la empresa en general. La A es gasto de ventas, la C es financiero y la D es costo de producción."],
+["¿Qué ocurre con las cuentas de gastos al finalizar el periodo contable?",["Se suman directamente al total de los activos en el Balance General.","Se acumulan para el año siguiente sin sufrir ninguna modificación.","Se cancelan o cierran contra la cuenta de \"Pérdidas y Ganancias\" para calcular el resultado neto (utilidad o pérdida).","Se transforman en capital contribuido de los accionistas."],"C","Son cuentas nominales: se cierran contra Pérdidas y Ganancias y quedan en cero. La A falla porque no son activos, la B porque no pasan saldo y la D no tiene base."]];
+$('#selList').innerHTML=S.map((q,i)=>`<div class="q"><span class="num">${i+1}.</span><span class="stem">${q[0]}</span><ol>${q[1].map((o,j)=>`<li><b>${'ABCD'[j]})</b>${o}</li>`).join('')}</ol>${det(`<span class="r">Respuesta: ${q[2]}</span><br>Justificación: ${q[3]}`)}</div>`).join('');
+
+// Show / hide all
+const all=open=>{document.querySelectorAll('details.toggle').forEach(d=>d.open=open);syncOrig();};
+$('#showAll').onclick=()=>all(true);$('#hideAll').onclick=()=>all(false);
+
+// ===== Simulacro =====
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const bank=[];
+S.forEach(q=>bank.push({k:'Selección múltiple',q:q[0],o:q[1],a:'ABCD'.indexOf(q[2]),why:q[3]}));
+vf.forEach(v=>bank.push({k:'Verdadero o Falso',q:v[0],o:['Verdadero','Falso'],a:v[1]?0:1,why:v[2]||(v[1]?'La afirmación es correcta.':'')}));
+const cats=['Activo','Pasivo','Capital','Ingreso','Gasto'];
+clasif.forEach(c=>{const ans=c[1].split(' ')[0];bank.push({k:'Clasificar la cuenta',q:`¿A qué grupo pertenece "${c[0]}"?`,o:cats,a:cats.indexOf(ans),why:c[1]})});
+const grp={Activo:'Activo y Gasto aumentan al Débito.',Gasto:'Activo y Gasto aumentan al Débito.',Pasivo:'Pasivo, Capital e Ingreso aumentan al Crédito.',Capital:'Pasivo, Capital e Ingreso aumentan al Crédito.',Ingreso:'Pasivo, Capital e Ingreso aumentan al Crédito.'};
+org.slice(1).forEach(o=>bank.push({k:'Origen de la cuenta',q:`"${o[0]}" es ${o[1]}. ¿Cuál es su origen?`,o:['Débito','Crédito'],a:o[2]==='Débito'?0:1,why:grp[o[1]]}));
+const num=(k,q,ans,why)=>{const d=new Set([ans]);const deltas=shuffle([0.1,0.2,0.25,0.5,1,2]);let t=0;while(d.size<4&&t<20){const x=Math.round(ans*(1+(Math.random()<.5?-1:1)*deltas[t%6])/100)*100;if(x>0)d.add(x);t++}
+  const o=shuffle([...d]);bank.push({k,q,o:o.map(v=>'$'+fmt(v)),a:o.indexOf(ans),why})};
+[[150000,60000,null],[null,45000,110000],[320000,null,200000],[450000,160000,null],[null,275000,585000],[810000,null,530000],...bl.map(r=>r.slice(0,3))].forEach(r=>{
+  const [A,P,C]=r;
+  if(A===null)num('Ecuación contable',`Pasivo = $${fmt(P)} y Capital = $${fmt(C)}. ¿Cuánto es el Activo?`,P+C,`Activo = Pasivo + Capital = ${fmt(P)} + ${fmt(C)} = ${fmt(P+C)}`);
+  else if(P===null)num('Ecuación contable',`Activo = $${fmt(A)} y Capital = $${fmt(C)}. ¿Cuánto es el Pasivo?`,A-C,`Pasivo = Activo − Capital = ${fmt(A)} − ${fmt(C)} = ${fmt(A-C)}`);
+  else num('Ecuación contable',`Activo = $${fmt(A)} y Pasivo = $${fmt(P)}. ¿Cuánto es el Capital?`,A-P,`Capital = Activo − Pasivo = ${fmt(A)} − ${fmt(P)} = ${fmt(A-P)}`);
+});
+num('Ecuación contable','Edificio $350,000, Escritorio $15,000, Sillas $25,000, Computadora $105,000, Cuentas por pagar $5,000, Préstamo $250,000. ¿Cuánto es el Capital?',240000,'Activo 495,000 − Pasivo 255,000 = 240,000');
+num('Ecuación contable','Aporte inicial $3,500,000, Cuenta por pagar $95,000, Hipoteca $150,000, Interés por pagar $25,000. ¿Cuánto es el Activo?',3770000,'Pasivo 270,000 + Capital 3,500,000 = 3,770,000');
+
+let X=null;
+const stage=$('#stage');
+function startExam(){
+  const n=Math.min(+$('#nq').value,bank.length);
+  X={qs:shuffle(bank).slice(0,n).map(q=>{const idx=shuffle(q.o.map((_,i)=>i));return q.o.length===2?{...q}:{...q,o:idx.map(i=>q.o[i]),a:idx.indexOf(q.a)}}),i:0,ok:0,miss:[]};
+  stage.hidden=false;render();
+}
+function render(){
+  const q=X.qs[X.i],n=X.qs.length;
+  stage.innerHTML=`<div class="bar"><i style="width:${X.i/n*100}%"></i></div>
+  <div class="meta"><span>Pregunta ${X.i+1} de ${n}</span><span>Aciertos: ${X.ok}</span></div>
+  <div class="kind" style="margin-top:14px">${q.k}</div>
+  <div class="stem" style="font-weight:600;font-size:1.1rem;margin-top:4px">${q.q}</div>
+  <div class="opts">${q.o.map((o,j)=>`<button type="button" class="opt" data-j="${j}">${q.o.length>2?'<b style="font-family:var(--mono)">'+'ABCDE'[j]+')</b> ':''}${o}</button>`).join('')}</div>
+  <div class="fb" id="fb"></div>`;
+  stage.querySelectorAll('.opt').forEach(b=>b.onclick=()=>pick(+b.dataset.j));
+}
+function pick(j){
+  const q=X.qs[X.i],right=j===q.a;
+  stage.querySelectorAll('.opt').forEach((b,k)=>{b.disabled=true;if(k===q.a)b.classList.add('ok');else if(k===j)b.classList.add('no')});
+  if(right)X.ok++;else X.miss.push({q,j});
+  const last=X.i===X.qs.length-1;
+  $('#fb').innerHTML=`<div class="ans ${right?'vf v':'vf f'}"><span class="r">${right?'Correcto':'Incorrecto'}</span>${q.why?'<br>'+q.why:''}</div>
+  <div class="tools"><button type="button" id="nx">${last?'Ver nota':'Siguiente'}</button></div>`;
+  $('#nx').onclick=()=>{last?finish():(X.i++,render())};$('#nx').focus();
+}
+function finish(){
+  const n=X.qs.length,pct=Math.round(X.ok/n*100);
+  const msg=pct>=90?'Listo para el examen.':pct>=70?'Vas bien. Repasa lo que fallaste.':'Repasa la teoría y vuelve a intentarlo.';
+  stage.innerHTML=`<div class="bar"><i style="width:100%"></i></div>
+  <div class="score">${pct}<span style="font-size:1.4rem">/100</span></div>
+  <p><b>${X.ok} de ${n}</b> correctas. ${msg}</p>
+  <div class="tools"><button type="button" id="again">Otro examen</button></div>
+  ${X.miss.length?'<h3>Lo que fallaste</h3>'+X.miss.map(m=>`<div class="miss"><div class="kind">${m.q.k}</div><b>${m.q.q}</b><br><span style="color:var(--bad)">Tu respuesta: ${m.q.o[m.j]}</span><br><span style="color:var(--ok)">Correcta: ${m.q.o[m.q.a]}</span>${m.q.why?'<br><span class="note">'+m.q.why+'</span>':''}</div>`).join(''):'<p>No fallaste ninguna.</p>'}`;
+  $('#again').onclick=startExam;
+  $('#exam').scrollIntoView();
+}
+$('#start').onclick=startExam;
+</script>
+
+</body></html>
