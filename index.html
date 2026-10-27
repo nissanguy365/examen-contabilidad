@@ -89,6 +89,24 @@ footer{margin-top:60px;font-size:.85rem;color:var(--muted);border-top:1px solid 
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 html{scroll-behavior:smooth}
 section{scroll-margin-top:70px}
+#consolidado{background:var(--paper);border:2px solid var(--accent);border-radius:8px;padding:18px;margin-top:20px}
+#consolidado h2{margin-top:0;border:0;padding:0}
+#consolidado h3{margin-top:28px}
+.mode{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.mode label{display:flex;gap:6px;align-items:center;padding:6px 12px;border:1px solid var(--rule);border-radius:999px;cursor:pointer;font-weight:600;font-size:.9rem}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft);font-weight:600}
+.cx-row{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--rule)}
+.cx-row:last-child{border-bottom:0}
+.cx-row select{width:100%;min-width:0}
+.cx-row select.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--bg))}
+.cx-row select.no{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,var(--bg))}
+.cx-name{font-weight:600}
+.cx-fb{grid-column:1/-1}
+.cx-fb .ans{margin-top:0;font-size:.92rem}
+.cx-tf{display:flex;gap:8px;margin-top:10px}
+.cx-tf .opt{flex:1;text-align:center}
+textarea.cx-ta{width:100%;box-sizing:border-box;font:inherit;padding:10px;border-radius:8px;border:1px solid var(--rule);background:var(--bg);color:var(--ink);margin-top:8px;min-height:80px}
+@media (max-width:560px){.cx-row{grid-template-columns:1fr 1fr}.cx-name{grid-column:1/-1}}
 </style>
 
 <div class="wrap">
@@ -103,10 +121,22 @@ section{scroll-margin-top:70px}
 </header>
 
 <nav class="idx" aria-label="Secciones">
-  <a href="#exam">Simulacro</a><a href="#teoria">Teoría</a><a href="#reglas">Debe / Haber</a><a href="#clasificar">Clasificar</a>
+  <a href="#consolidado">Examen consolidado</a><a href="#exam">Simulacro</a><a href="#teoria">Teoría</a><a href="#reglas">Debe / Haber</a><a href="#clasificar">Clasificar</a>
   <a href="#ecuacion">Ecuación</a><a href="#origen">Origen D/C</a><a href="#vf">V o F</a>
   <a href="#conteste">Conteste</a><a href="#seleccion">Selección</a>
 </nav>
+
+<section id="consolidado">
+  <div class="eyebrow">Examen oficial resuelto</div>
+  <h2>Examen consolidado de Contabilidad General</h2>
+  <p>Las preguntas del examen consolidado, en su formato y orden: clasificación de cuentas, selección múltiple, contesta brevemente y Verdadero o Falso.</p>
+  <div class="mode" role="radiogroup" aria-label="Modo">
+    <label><input type="radio" name="cxMode" value="p" checked> Modo práctica: corrige al instante</label>
+    <label><input type="radio" name="cxMode" value="e"> Modo examen: nota al final</label>
+  </div>
+  <div class="tools"><button type="button" id="cxStart">Empezar</button></div>
+  <div id="cxStage" hidden></div>
+</section>
 
 <section id="exam">
   <div class="eyebrow">Ponte a prueba</div>
@@ -478,6 +508,111 @@ function finish(){
   $('#exam').scrollIntoView();
 }
 $('#start').onclick=startExam;
+
+// ===== Examen consolidado =====
+const CX={
+ clas:[["Banco","Activo","Débito","Activo corriente: recurso disponible; aumenta por el debe."],
+  ["Terreno","Activo","Débito","Activo no corriente (fijo): propiedad tangible; aumenta por el debe."],
+  ["Hipoteca por pagar","Pasivo","Crédito","Obligación de pago; aumenta por el haber."],
+  ["Inversiones","Activo","Débito","Derecho o recurso económico financiero."],
+  ["Gasto de sueldos / Pago de agua","Gasto","Débito","Disminución del patrimonio por servicios."],
+  ["Edificio","Activo","Débito","Activo no corriente (fijo): propiedad física indispensable para operar."],
+  ["Préstamos bancarios","Pasivo","Crédito","Deuda con entidades financieras."],
+  ["Equipo de transporte","Activo","Débito","Activo no corriente (fijo): vehículos de uso comercial u operacional."],
+  ["Ventas de servicios","Ingreso","Crédito","Entrada de recursos por la actividad principal."]],
+ mc:[
+  [1,"¿Qué representa una cuenta de activo en la contabilidad de una empresa?",["Las deudas y obligaciones financieras que la empresa debe pagar a terceros.","Los bienes, derechos y recursos controlados económicamente de los cuales se esperan beneficios futuros.","Los ingresos generados exclusivamente por la venta de mercancías al contado.","El capital aportado únicamente por los socios fundadores."],1,"El activo es lo que la empresa posee o controla y de lo que espera beneficios futuros."],
+  [2,"¿Cuál corresponde a un ejemplo de Activo Corriente?",["Maquinaria y equipo de producción.","Edificios administrativos.","Cuentas por cobrar a clientes.","Patentes y marcas registradas."],2,"Las cuentas por cobrar se convierten en efectivo en menos de un año; las demás son no corrientes."],
+  [3,"¿Cómo se clasifican los activos tangibles de los bienes de la empresa?",["Activos diferidos.","Pasivos corrientes.","Propiedades, Planta y Equipo (Activo Fijo).","Activos intangibles."],2,"Terrenos, edificios y vehículos son Propiedades, Planta y Equipo."],
+  [5,"¿Cómo se le denomina comúnmente a la aportación inicial de los socios?",["Utilidades retenidas.","Capital social.","Pasivo a largo plazo.","Reserva legal."],1,"Lo que aportan los socios es el Capital social."],
+  [6,"El débito de la cuenta de pasivo es el:",["Lado de aumento.","Lado que disminuye.","Lado derecho."],1,"El pasivo aumenta en el haber (crédito); el débito lo disminuye. Además, el débito es el lado izquierdo."],
+  [7,"El lado de balance normal de la cuenta de activo es el:",["Lado débito.","Lado crédito.","Lado que disminuye."],0,"El activo tiene saldo normal deudor."],
+  [8,"El lado opuesto (disminución) de la cuenta de activos es el:",["Lado débito.","Lado crédito.","Lado de aumento."],1,"El activo aumenta por el débito y disminuye por el crédito."],
+  [9,"El lado de disminución de la cuenta de capital es el:",["Lado del balance.","Lado débito.","Lado crédito."],1,"El capital aumenta por el haber (crédito) y disminuye por el debe (débito)."],
+  [10,"¿Qué indica la Ecuación Contable Básica?",["Capital = Activo × Pasivo","Capital = Activo − Pasivo","Capital = Pasivo − Activo","Activo = Pasivo + Capital"],3,"La ecuación básica es Activo = Pasivo + Capital. Capital = Activo − Pasivo es su despeje, pero la respuesta del examen es la D."]],
+ brev:[["¿Qué es un activo en contabilidad?","Es un recurso económico presente, controlado por la empresa como resultado de sucesos pasados, del cual se esperan beneficios económicos futuros."],
+  ["Mencione tres ejemplos de activos fijos.","1) Terrenos, 2) Edificios, 3) Maquinaria y Equipo de Transporte."],
+  ["¿Qué es un pasivo?","Representa las deudas, cargas u obligaciones financieras presentes de la empresa, derivadas de transacciones pasadas, que deberán ser liquidadas en el futuro."]],
+ vf:[["El efectivo en caja es una cuenta de activo circulante/corriente.",1,"Es el activo con mayor disponibilidad y liquidez inmediata."],
+  ["Las cuentas por cobrar representan un derecho y son un activo.",1,"Son derechos exigibles a favor de la empresa frente a terceros."],
+  ["Los terrenos y edificios de la empresa son pasivos.",0,"Son activos no corrientes (propiedades, planta y equipo)."],
+  ["Un inventario de mercancías se considera un activo.",1,"Es un recurso destinado a la venta que genera ingresos futuros."],
+  ["Los activos aumentan con un registro en el haber.",0,"Los activos aumentan por el debe (débito) y disminuyen por el haber."],
+  ["Los pasivos son obligaciones presentes derivadas de sucesos pasados.",1,"Definición oficial NIIF de la naturaleza del pasivo."],
+  ["Las cuentas por pagar a proveedores son un activo.",0,"Son pasivos corrientes: corresponden a deudas por pagar."],
+  ["Los préstamos bancarios a largo plazo son pasivos.",1,"Obligaciones financieras exigibles a más de 1 año."],
+  ["Los pasivos aumentan anotando una cantidad en el haber (crédito).",1,"Son de naturaleza acreedora; su saldo aumenta en el haber."],
+  ["Los impuestos por pagar se consideran un pasivo corriente.",1,"Son deudas fiscales a corto plazo."],
+  ["Un documento por pagar disminuye el activo/pasivo cuando se firma.",0,"Al firmarse se reconoce (aumenta) un pasivo por la obligación contraída."],
+  ["El capital contable es la diferencia entre activo y pasivo.",1,"Capital = Activo − Pasivo."],
+  ["Las cuentas de capital aumentan con un cargo en el debe.",0,"El capital aumenta con créditos en el haber; los cargos en el debe lo disminuyen."],
+  ["La ecuación contable básica es Activo = Pasivo + Capital.",1,"Fórmula fundamental de la contabilidad por partida doble."],
+  ["Las marcas y patentes son ejemplos de activos intangibles.",1,"Bienes de valor económico sin sustancia física."]]
+};
+const cxTypes=['Activo','Pasivo','Capital','Gasto','Ingreso'],cxOrig=['Débito','Crédito'];
+let cx=null;
+function cxItem(k){
+  const t=k[0],i=+k.slice(1);
+  if(t==='c'){const c=CX.clas[i];return{ok:cx.a[k+'t']===c[1]&&cx.a[k+'o']===c[2],answered:!!(cx.a[k+'t']&&cx.a[k+'o']),right:`${c[1]} · ${c[2]}`,why:c[3]}}
+  if(t==='m'){const q=CX.mc[i];return{ok:cx.a[k]===q[3],answered:cx.a[k]!==undefined,right:`${'ABCD'[q[3]]}) ${q[2][q[3]]}`,why:q[4]}}
+  const v=CX.vf[i];return{ok:cx.a[k]===(v[1]?0:1),answered:cx.a[k]!==undefined,right:v[1]?'Verdadero':'Falso',why:v[2]};
+}
+function cxCheck(k,force){
+  const r=cxItem(k);if(!r.answered&&!force)return;
+  const t=k[0],i=+k.slice(1);
+  if(t==='c'){const c=CX.clas[i];document.querySelectorAll(`#cxStage select[data-k="${k}"]`).forEach(s=>{s.disabled=true;s.classList.remove('ok','no');s.classList.add(s.value===(s.dataset.f==='t'?c[1]:c[2])?'ok':'no')})}
+  else{const a=t==='m'?CX.mc[i][3]:(CX.vf[i][1]?0:1);document.querySelectorAll(`#cxStage .opt[data-k="${k}"]`).forEach((b,j)=>{b.disabled=true;b.classList.remove('sel');if(j===a)b.classList.add('ok');else if(j===cx.a[k])b.classList.add('no')})}
+  const head=!r.answered?'Sin responder':r.ok?'Correcto':'Incorrecto';
+  $('#fb-'+k).innerHTML=`<div class="ans vf ${r.ok?'v':'f'}"><span class="r">${head}</span>${r.ok?'':' · Correcta: '+r.right}<br>${r.why}</div>`;
+}
+function cxStart(){
+  cx={p:document.querySelector('input[name=cxMode]:checked').value==='p',a:{},done:false};
+  const st=$('#cxStage');st.hidden=false;
+  let h=`<h3>I. Clasificación de cuentas y naturaleza</h3><p class="note">Indique el tipo de cuenta y su origen normal (Débito / Crédito).</p><div class="q">`+
+   CX.clas.map((c,i)=>`<div class="cx-row"><span class="cx-name">${c[0]}</span>
+    <select data-k="c${i}" data-f="t" aria-label="Tipo de ${c[0]}"><option value="">Tipo…</option>${cxTypes.map(t=>`<option>${t}</option>`).join('')}</select>
+    <select data-k="c${i}" data-f="o" aria-label="Origen de ${c[0]}"><option value="">Origen…</option>${cxOrig.map(t=>`<option>${t}</option>`).join('')}</select>
+    <div class="cx-fb" id="fb-c${i}"></div></div>`).join('')+`</div>`;
+  h+=`<h3>II. Selección múltiple</h3>`+CX.mc.map((q,i)=>`<div class="q"><span class="num">${q[0]}.</span><span class="stem">${q[1]}</span>
+    <div class="opts">${q[2].map((o,j)=>`<button type="button" class="opt" data-k="m${i}" data-j="${j}"><b style="font-family:var(--mono)">${'ABCD'[j]})</b> ${o}</button>`).join('')}</div><div class="fb" id="fb-m${i}"></div></div>`).join('');
+  h+=`<h3>III. Contesta brevemente</h3><p class="note">Escribe tu respuesta y compárala con la del examen. No entra en la nota automática.</p>`+CX.brev.map((b,i)=>`<div class="q"><span class="num">${i+1}.</span><span class="stem">${b[0]}</span>
+    <textarea class="cx-ta" aria-label="${b[0]}" placeholder="Tu respuesta…"></textarea>
+    <div class="tools"><button type="button" class="ghost" data-show="b${i}">Ver respuesta</button></div><div class="ans" id="fb-b${i}" hidden><b>Respuesta:</b> ${b[1]}</div></div>`).join('');
+  h+=`<h3>IV. Escribe Falso (F) o Verdadero (V)</h3>`+CX.vf.map((v,i)=>`<div class="q"><span class="num">${i+1}.</span>${v[0]}
+    <div class="cx-tf">${['Verdadero','Falso'].map((o,j)=>`<button type="button" class="opt" data-k="v${i}" data-j="${j}">${o}</button>`).join('')}</div><div class="fb" id="fb-v${i}"></div></div>`).join('');
+  h+=`<div class="rule-box"><b>Resumen de regla contable</b><br>Aumentan por el Debe (Débito): Activos y Gastos.<br>Aumentan por el Haber (Crédito): Pasivos, Capital e Ingresos.</div>
+  <div class="tools"><button type="button" id="cxFin">${cx.p?'Ver mi nota':'Terminar y corregir'}</button></div><div id="cxRes"></div>`;
+  st.innerHTML=h;
+  st.querySelectorAll('select').forEach(s=>s.onchange=()=>{cx.a[s.dataset.k+s.dataset.f]=s.value;if(cx.p)cxCheck(s.dataset.k)});
+  st.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    if(cx.done)return;const k=b.dataset.k;
+    cx.a[k]=+b.dataset.j;
+    st.querySelectorAll(`.opt[data-k="${k}"]`).forEach(x=>x.classList.toggle('sel',x===b));
+    if(cx.p)cxCheck(k);
+  });
+  st.querySelectorAll('[data-show]').forEach(b=>b.onclick=()=>{const a=$('#fb-'+b.dataset.show);a.hidden=!a.hidden;b.textContent=a.hidden?'Ver respuesta':'Ocultar respuesta'});
+  $('#cxFin').onclick=cxFinish;
+  $('#consolidado').scrollIntoView();
+}
+function cxFinish(){
+  cx.done=true;
+  const keys=[...CX.clas.map((_,i)=>'c'+i),...CX.mc.map((_,i)=>'m'+i),...CX.vf.map((_,i)=>'v'+i)];
+  keys.forEach(k=>cxCheck(k,true));
+  const part=(p,n)=>keys.filter(k=>k[0]===p&&cxItem(k).ok).length;
+  const c=part('c'),m=part('m'),v=part('v'),n=keys.length,tot=c+m+v,pct=Math.round(tot/n*100);
+  const msg=pct>=90?'Listo para el examen.':pct>=70?'Vas bien. Repasa lo que fallaste (marcado en rojo arriba).':'Repasa la teoría y vuelve a intentarlo.';
+  $('#cxFin').disabled=true;
+  $('#cxRes').innerHTML=`<div class="q" style="margin-top:16px"><div class="kind">Resultado</div><div class="score">${pct}<span style="font-size:1.4rem">/100</span></div>
+  <p><b>${tot} de ${n}</b> correctas. ${msg}</p>
+  <div class="tbl"><table><tr><th>Parte</th><th style="text-align:right">Aciertos</th></tr>
+  <tr><td>I. Clasificación (tipo y origen)</td><td class="n">${c} / ${CX.clas.length}</td></tr>
+  <tr><td>II. Selección múltiple</td><td class="n">${m} / ${CX.mc.length}</td></tr>
+  <tr><td>IV. Verdadero o Falso</td><td class="n">${v} / ${CX.vf.length}</td></tr></table></div>
+  <p class="note">La parte III (contesta brevemente) no entra en la nota: compárala tú con la respuesta del examen.</p>
+  <div class="tools"><button type="button" id="cxAgain">Repetir examen</button></div></div>`;
+  $('#cxAgain').onclick=cxStart;$('#cxRes').scrollIntoView();
+}
+$('#cxStart').onclick=cxStart;
 </script>
 
 </body></html>
